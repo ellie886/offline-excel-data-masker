@@ -1,0 +1,16 @@
+[browser]
+gatherUsageStats = false
+
+[server]
+address = "127.0.0.1"
+headless = true
+enableCORS = true
+enableXsrfProtection = true
+fileWatcherType = "none"
+maxUploadSize = 100
+maxMessageSize = 120
+
+[client]
+showErrorDetails = "type"
+toolbarMode = "minimal"
+

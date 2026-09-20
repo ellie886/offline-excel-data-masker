@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "offline-data-masker"
+version = "0.1.0"
+description = "Offline Excel data masking tool for sensitive financial and diligence workbooks"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "openpyxl>=3.1.5,<4",
+  "streamlit>=1.50,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<10",
+  "pytest-cov>=6,<8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/offline_masker"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["offline_masker"]

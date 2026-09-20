@@ -1,0 +1,2 @@
+"""Local audit report generation."""
+
