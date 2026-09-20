@@ -1,6 +1,5 @@
 # 离线 Excel 数据脱敏工具
 
-[![Tests](https://github.com/ellie886/offline-excel-data-masker/actions/workflows/tests.yml/badge.svg)](https://github.com/ellie886/offline-excel-data-masker/actions/workflows/tests.yml)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
