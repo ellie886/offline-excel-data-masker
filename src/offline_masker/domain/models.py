@@ -14,6 +14,7 @@ class SheetInfo:
     max_row: int
     max_column: int
     formula_count: int
+    formula_cache_count: int
     merged_range_count: int
     hidden_row_count: int
     hidden_column_count: int
@@ -28,6 +29,15 @@ class WorkbookInspection:
     warnings: list[str] = field(default_factory=list)
     unsupported_items: list[str] = field(default_factory=list)
     package_parts: list[str] = field(default_factory=list)
+    blocking_risks: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class HeaderDetection:
+    sheet: str
+    row: int
+    confidence: float
+    basis: str
 
 
 @dataclass(slots=True)
@@ -52,7 +62,8 @@ class Candidate:
     candidate_id: str
     sheet: str
     coordinate: str
-    original_value: str
+    original_value: Any
+    original_kind: str
     safe_preview: str
     sensitive_type: SensitiveType
     suggested_method: MaskMethod
@@ -61,8 +72,10 @@ class Candidate:
     start: int
     end: int
     enabled: bool = True
-    replacement_override: str = ""
+    replacement_override: Any = ""
     method: MaskMethod | None = None
+    replacement_value: Any | None = None
+    replacement_kind: str | None = None
 
     @property
     def effective_method(self) -> MaskMethod:
@@ -80,8 +93,13 @@ class PatchOperation:
     sheet: str
     coordinate: str
     expected_value_hash: str
-    replacement_value: str
+    original_value: Any
+    original_kind: str
+    replacement_value: Any
+    replacement_kind: str
     candidate_count: int
+    sensitive_types: tuple[SensitiveType, ...] = ()
+    sensitive_originals: tuple[Any, ...] = ()
 
 
 @dataclass(slots=True)
@@ -90,6 +108,10 @@ class PatchResult:
     modified_parts: set[str]
     modified_cells: int
     replacement_count: int
+    shared_strings_removed: int = 0
+    formula_caches_cleared: int = 0
+    calculation_properties_changed: bool = False
+    allowed_part_changes: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -119,6 +141,8 @@ class ProcessingResult:
     processed_at: datetime
     replacement_count: int
     risk_warnings: list[str]
+    shared_strings_removed: int = 0
+    formula_caches_cleared: int = 0
 
 
 @dataclass(slots=True)

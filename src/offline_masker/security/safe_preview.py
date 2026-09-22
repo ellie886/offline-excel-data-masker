@@ -9,9 +9,12 @@ def _mask_middle(value: str, left: int, right: int) -> str:
     return value[:left] + "*" * min(max(len(value) - left - right, 1), 8) + value[-right:]
 
 
-def safe_preview(value: str, sensitive_type: SensitiveType) -> str:
+def safe_preview(value: object, sensitive_type: SensitiveType) -> str:
     if not value:
         return "[空值]"
+    if sensitive_type == SensitiveType.FINANCIAL_AMOUNT:
+        return "[财务数值已隐藏]"
+    value = str(value)
     if sensitive_type == SensitiveType.PHONE:
         return _mask_middle(value, 3, 4)
     if sensitive_type == SensitiveType.ID_CARD:
@@ -29,4 +32,3 @@ def safe_preview(value: str, sensitive_type: SensitiveType) -> str:
     if len(value) == 2:
         return value[0] + "*"
     return value[0] + "*" * min(len(value) - 2, 6) + value[-1]
-

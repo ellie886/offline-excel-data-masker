@@ -8,7 +8,7 @@ from io import BytesIO
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
-from offline_masker.domain.models import Candidate, ValidationResult
+from offline_masker.domain.models import Candidate, PatchResult, ValidationResult
 from offline_masker.security.hashing import short_fingerprint
 
 
@@ -28,6 +28,10 @@ def build_audit_report(
     candidates: list[Candidate],
     validation: ValidationResult,
     warnings: list[str],
+    source_sha256: str,
+    output_sha256: str,
+    patch_result: PatchResult,
+    high_risk_items: list[str] | None = None,
 ) -> bytes:
     selected = [candidate for candidate in candidates if candidate.enabled]
     workbook = Workbook()
@@ -47,8 +51,13 @@ def build_audit_report(
         ("处理时间", processed_at.isoformat(timespec="seconds")),
         ("原文件名称", source_filename),
         ("输出文件名称", output_filename),
+        ("原文件 SHA-256", source_sha256),
+        ("输出文件 SHA-256", output_sha256),
         ("扫描工作表", "、".join(scanned_sheets)),
         ("实际替换数量", len(selected)),
+        ("清理共享字符串", patch_result.shared_strings_removed),
+        ("清理公式缓存", patch_result.formula_caches_cleared),
+        ("发现高风险组件", "、".join(high_risk_items or []) or "无"),
         ("最终处理状态", "成功" if validation.passed else "校验失败"),
     ]
     for label, value in rows:
@@ -77,7 +86,10 @@ def build_audit_report(
     details.append(["工作表", "单元格", "安全预览", "类型", "脱敏方式", "识别依据", "原值指纹"])
     _style_header(details, 1, 7)
     for candidate in selected:
-        fragment = candidate.original_value[candidate.start : candidate.end]
+        fragment = (
+            candidate.original_value[candidate.start : candidate.end]
+            if candidate.original_kind == "text" else candidate.original_value
+        )
         details.append(
             [
                 candidate.sheet,
@@ -86,7 +98,7 @@ def build_audit_report(
                 candidate.sensitive_type.value,
                 candidate.effective_method.value,
                 candidate.basis,
-                short_fingerprint(fragment),
+                short_fingerprint(fragment, candidate.original_kind),
             ]
         )
     details.freeze_panes = "A2"

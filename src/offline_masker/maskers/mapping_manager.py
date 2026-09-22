@@ -20,10 +20,9 @@ class MappingManager:
         if key not in self._mappings:
             self._counters[sensitive_type] += 1
             prefix = self._prefixes.get(sensitive_type, "对象")
-            self._mappings[key] = f"{prefix}{self._counters[sensitive_type]:03d}"
+            self._mappings[key] = f"【已脱敏-{prefix}-{self._counters[sensitive_type]:03d}】"
         return self._mappings[key]
 
     def clear(self) -> None:
         self._mappings.clear()
         self._counters.clear()
-

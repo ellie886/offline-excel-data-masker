@@ -101,21 +101,24 @@ class EndToEndTests(unittest.TestCase):
         source = convert_a2_to_shared_string(build_workbook())
         scan = DetectionCoordinator().scan(
             source,
-            ["客户明细"],
+            ["客户明细", "隐藏附表"],
             {SensitiveType.CUSTOMER},
-            [ColumnRule("客户明细", "A", SensitiveType.CUSTOMER)],
+            [
+                ColumnRule("客户明细", "A", SensitiveType.CUSTOMER),
+                ColumnRule("隐藏附表", "A", SensitiveType.CUSTOMER),
+            ],
         )
-        self.assertEqual(len(scan.candidates), 2)
+        self.assertEqual(len(scan.candidates), 3)
         result = ProcessingService().process(
             source=source,
             source_filename="shared.xlsx",
-            scanned_sheets=["客户明细"],
+            scanned_sheets=["客户明细", "隐藏附表"],
             candidates=scan.candidates,
         )
         self.assertTrue(result.validation.passed)
         workbook = load_workbook(BytesIO(result.output_bytes))
         try:
-            self.assertEqual(workbook["客户明细"]["A2"].value, "客户001")
+            self.assertEqual(workbook["客户明细"]["A2"].value, "【已脱敏-客户-001】")
         finally:
             workbook.close()
 
@@ -158,10 +161,10 @@ class EndToEndTests(unittest.TestCase):
         try:
             self.assertEqual(workbook.sheetnames, ["客户明细", "隐藏附表"])
             self.assertEqual(workbook["隐藏附表"].sheet_state, "hidden")
-            self.assertEqual(workbook["客户明细"]["A2"].value, "客户001")
-            self.assertEqual(workbook["隐藏附表"]["A2"].value, "客户001")
-            self.assertEqual(workbook["客户明细"]["B2"].value, "138****5678")
-            self.assertEqual(workbook["客户明细"]["E2"].value, "t*******r@example.com")
+            self.assertEqual(workbook["客户明细"]["A2"].value, "【已脱敏-客户-001】")
+            self.assertEqual(workbook["隐藏附表"]["A2"].value, "【已脱敏-客户-001】")
+            self.assertEqual(workbook["客户明细"]["B2"].value, "【已脱敏-手机号】")
+            self.assertEqual(workbook["客户明细"]["E2"].value, "【已脱敏-邮箱】")
             self.assertEqual(workbook["客户明细"]["C2"].value, 100)
             self.assertEqual(workbook["客户明细"]["C3"].value, 200)
             self.assertEqual(workbook["客户明细"]["D2"].value, "=SUM(C2:C3)")

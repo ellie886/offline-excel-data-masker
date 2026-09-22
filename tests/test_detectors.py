@@ -26,9 +26,9 @@ class DetectorTests(unittest.TestCase):
         )
 
     def test_masking_examples(self) -> None:
-        self.assertEqual(mask_value("13812345678", SensitiveType.PHONE), "138****5678")
-        self.assertEqual(mask_value("test@example.com", SensitiveType.EMAIL), "t**t@example.com")
-        self.assertEqual(mask_value("6222021234567890", SensitiveType.BANK_ACCOUNT), "****7890")
+        self.assertEqual(mask_value("13812345678", SensitiveType.PHONE), "【已脱敏-手机号】")
+        self.assertEqual(mask_value("test@example.com", SensitiveType.EMAIL), "【已脱敏-邮箱】")
+        self.assertEqual(mask_value("6222021234567890", SensitiveType.BANK_ACCOUNT), "【已脱敏-银行账号】")
 
     def test_mapping_is_consistent_and_type_scoped(self) -> None:
         manager = MappingManager()
@@ -36,10 +36,9 @@ class DetectorTests(unittest.TestCase):
         second = manager.replacement_for(SensitiveType.CUSTOMER, "北京甲公司")
         supplier = manager.replacement_for(SensitiveType.SUPPLIER, "北京甲公司")
         self.assertEqual(first, second)
-        self.assertEqual(first, "客户001")
-        self.assertEqual(supplier, "供应商001")
+        self.assertEqual(first, "【已脱敏-客户-001】")
+        self.assertEqual(supplier, "【已脱敏-供应商-001】")
 
 
 if __name__ == "__main__":
     unittest.main()
-

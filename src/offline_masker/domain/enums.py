@@ -14,6 +14,7 @@ class SensitiveType(StrEnum):
     COMPANY = "企业名称"
     ADDRESS = "地址"
     CONTRACT = "合同编号"
+    FINANCIAL_AMOUNT = "财务金额"
     CUSTOM = "自定义敏感词"
 
 
@@ -21,6 +22,7 @@ class MaskMethod(StrEnum):
     MASK = "掩码"
     CONSISTENT = "一致性编号"
     CUSTOM = "自定义替换"
+    CONSTANT_888 = "固定数值888"
 
 
 DEFAULT_METHODS: dict[SensitiveType, MaskMethod] = {
@@ -34,12 +36,13 @@ DEFAULT_METHODS: dict[SensitiveType, MaskMethod] = {
     SensitiveType.COMPANY: MaskMethod.CONSISTENT,
     SensitiveType.ADDRESS: MaskMethod.CONSISTENT,
     SensitiveType.CONTRACT: MaskMethod.CONSISTENT,
+    SensitiveType.FINANCIAL_AMOUNT: MaskMethod.CONSTANT_888,
     SensitiveType.CUSTOM: MaskMethod.CUSTOM,
 }
 
 
 MAPPING_PREFIXES: dict[SensitiveType, str] = {
-    SensitiveType.PERSON_NAME: "人员",
+    SensitiveType.PERSON_NAME: "姓名",
     SensitiveType.CUSTOMER: "客户",
     SensitiveType.SUPPLIER: "供应商",
     SensitiveType.COMPANY: "企业",
@@ -47,4 +50,3 @@ MAPPING_PREFIXES: dict[SensitiveType, str] = {
     SensitiveType.CONTRACT: "合同",
     SensitiveType.CUSTOM: "敏感词",
 }
-

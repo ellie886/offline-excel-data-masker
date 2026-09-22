@@ -6,6 +6,10 @@ from offline_masker.domain.enums import SensitiveType
 
 
 HEADER_RULES: list[tuple[SensitiveType, re.Pattern[str]]] = [
+    (
+        SensitiveType.FINANCIAL_AMOUNT,
+        re.compile(r"销售收入|营业收入|收入|销售额|合同金额|采购金额|含税金额|金额|成本|单价|毛利|利润|税额|回款|应收|应付|工资|奖金|薪酬"),
+    ),
     (SensitiveType.PHONE, re.compile(r"手机|手机号|联系电话|移动电话")),
     (SensitiveType.ID_CARD, re.compile(r"身份证|证件号码|身份证号")),
     (SensitiveType.EMAIL, re.compile(r"邮箱|电子邮件|e-?mail", re.I)),
@@ -29,4 +33,3 @@ def infer_header_type(value: object) -> tuple[SensitiveType, str] | None:
         if pattern.search(text):
             return sensitive_type, f"表头“{text}”命中关键词规则"
     return None
-
